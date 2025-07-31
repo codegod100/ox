@@ -1,0 +1,44 @@
+# Ignore build artifacts and cache directories
+target/
+dist/
+node_modules/
+
+# Ignore development files
+.git/
+.gitignore
+README.md
+*.md
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore temporary files
+*.tmp
+*.temp
+*.log
+
+# Ignore Docker files to prevent recursion
+Dockerfile
+.dockerignore
+
+# Ignore development environment files
+.env
+.env.local
+.env.development
+.env.test
+
+# Ignore test files and coverage reports
+tests/
+coverage/
+*.test
+
+# Ignore package manager files that aren't needed
+package-lock.json
+yarn.lock
