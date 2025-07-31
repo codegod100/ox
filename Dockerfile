@@ -17,10 +17,10 @@ RUN cargo binstall dioxus-cli --no-confirm --root /.cargo
 ENV PATH="/.cargo/bin:$PATH"
 
 # Create the final bundle folder. Bundle always executes in release mode with optimizations enabled
-RUN dx bundle --platform fullstack
+RUN dx bundle --platform server
 
 FROM chef AS runtime
-COPY --from=builder /app/target/dx/ox/release/fullstack/ /usr/local/app
+COPY --from=builder /app/target/dx/ox/release/server/ /usr/local/app
 
 # set our port and make sure to listen for all connections
 ENV PORT=8080
