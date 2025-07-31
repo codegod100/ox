@@ -1,69 +1,33 @@
-# Multi-stage Docker build for Dioxus fullstack application
-
-# Stage 1: Build the application
-FROM docker.io/library/rust:latest as builder
-
-# Install required dependencies
-RUN apt-get update && apt-get install -y \
-    pkg-config \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install wasm target for frontend builds
-RUN rustup target add wasm32-unknown-unknown
-
-# Set working directory
+FROM rust:1 AS chef
+RUN cargo install cargo-chef
 WORKDIR /app
 
-# Copy dependency files first for better caching
-COPY Cargo.toml Cargo.lock ./
+FROM chef AS planner
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
 
-# Build dependencies first (better caching)
-RUN mkdir src && echo "fn main() {}" > src/main.rs && \
-    cargo build --release && \
-    rm -rf src
+FROM chef AS builder
+COPY --from=planner /app/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
+COPY . .
 
-# Copy source code and assets
-COPY src/ ./src/
-COPY assets/ ./assets/
+# Install `dx`
+RUN curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+RUN cargo binstall dioxus-cli --root /.cargo -y --force
+ENV PATH="/.cargo/bin:$PATH"
 
-# Build the application
-RUN cargo build --release
+# Create the final bundle folder. Bundle always executes in release mode with optimizations enabled
+RUN dx bundle --platform web
 
-# Stage 2: Runtime image
-FROM docker.io/library/debian:bookworm-slim
+FROM chef AS runtime
+COPY --from=builder /app/target/dx/ox/release/web/ /usr/local/app
 
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y \
-    ca-certificates \
-    libssl3 \
-    && rm -rf /var/lib/apt/lists/*
+# set our port and make sure to listen for all connections
+ENV PORT=8080
+ENV IP=0.0.0.0
 
-# Create app user
-RUN useradd -r -s /bin/false appuser
-
-# Set working directory
-WORKDIR /app
-
-# Copy the built binary from builder stage
-COPY --from=builder /app/target/release/ox ./
-
-# Copy assets
-COPY --from=builder /app/assets/ ./assets/
-
-# Change ownership to appuser
-RUN chown -R appuser:appuser /app
-
-# Switch to non-root user
-USER appuser
-
-# Expose the port (Dioxus default is 8080)
+# expose the port 8080
 EXPOSE 8080
 
-# Set environment variables
-ENV RUST_LOG=info
-ENV DIOXUS_PORT=8080
-ENV DIOXUS_HOST=0.0.0.0
-
-# Run the application
-CMD ["./ox"]
+WORKDIR /usr/local/app
+ENTRYPOINT [ "/usr/local/app/server" ]
