@@ -1,6 +1,9 @@
 use dioxus::prelude::*;
 use std::fmt;
 
+#[cfg(feature = "server")]
+use dioxus::fullstack::prelude::*;
+
 #[derive(Debug, Clone)]
 pub struct NoCustomError;
 
@@ -20,6 +23,8 @@ enum Route {
     Home {},
     #[route("/blog/:id")]
     Blog { id: i32 },
+    #[route("/:..segments")]
+    NotFound { segments: Vec<String> },
 }
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
@@ -27,11 +32,56 @@ const MAIN_CSS: Asset = asset!("/assets/main.css");
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
 
 fn main() {
+    // Add comprehensive startup logging
+    println!("🚀 Starting Ox server...");
+    println!("📍 Current working directory: {:?}", std::env::current_dir().unwrap_or_default());
+    println!("🌐 PORT: {}", std::env::var("PORT").unwrap_or_else(|_| "8080".to_string()));
+    println!("🔗 IP: {}", std::env::var("IP").unwrap_or_else(|_| "127.0.0.1".to_string()));
+    
+    // Log build type
+    #[cfg(debug_assertions)]
+    println!("🔧 Build: DEBUG");
+    #[cfg(not(debug_assertions))]
+    println!("🔧 Build: RELEASE");
+    
+    // Log feature flags
+    println!("⚙️  Features enabled:");
+    #[cfg(feature = "web")]
+    println!("  - web");
+    #[cfg(feature = "server")]
+    println!("  - server");
+    #[cfg(feature = "fullstack")]
+    println!("  - fullstack");
+    
+    println!("🎯 Routes configured:");
+    println!("  - GET / -> Home");
+    println!("  - GET /blog/:id -> Blog");
+    println!("  - GET /* -> NotFound (catch-all)");
+    
+    println!("📁 Assets configured:");
+    println!("  - favicon: {}", FAVICON);
+    println!("  - main.css: {}", MAIN_CSS);
+    println!("  - tailwind.css: {}", TAILWIND_CSS);
+    
+    println!("🚀 Launching Dioxus application...");
+    
+    // Add a simple check to see if we're in server mode
+    #[cfg(feature = "server")]
+    println!("🔧 Server feature enabled");
+    #[cfg(feature = "web")]
+    println!("🔧 Web feature enabled");
+    
     dioxus::launch(App);
 }
 
 #[component]
 fn App() -> Element {
+    println!("📱 App component rendering...");
+    println!("🔗 Loading assets:");
+    println!("  - Favicon: {}", FAVICON);
+    println!("  - Main CSS: {}", MAIN_CSS);
+    println!("  - Tailwind CSS: {}", TAILWIND_CSS);
+    
     rsx! {
         document::Link { rel: "icon", href: FAVICON }
         document::Link { rel: "stylesheet", href: MAIN_CSS } 
@@ -75,6 +125,7 @@ pub fn Hero() -> Element {
 /// Home page
 #[component]
 fn Home() -> Element {
+    println!("🏠 Home route matched - rendering Home component");
     rsx! {
         Hero {}
         Features {}
@@ -112,6 +163,7 @@ fn Features() -> Element {
 /// Blog page
 #[component]
 pub fn Blog(id: i32) -> Element {
+    println!("📝 Blog route matched - rendering Blog component with id: {}", id);
     let mut cat_url = use_signal(|| String::new());
     let mut loading = use_signal(|| false);
     let mut show_confetti = use_signal(|| false);
@@ -229,9 +281,30 @@ pub fn Blog(id: i32) -> Element {
     }
 }
 
+/// 404 Not Found page - logs unmatched routes
+#[component]
+fn NotFound(segments: Vec<String>) -> Element {
+    let path = format!("/{}", segments.join("/"));
+    println!("❌ 404 - Route not found: '{}'", path);
+    println!("❌ Segments: {:?}", segments);
+    
+    rsx! {
+        div {
+            h1 { "404 - Page Not Found" }
+            p { "The requested path '{path}' was not found." }
+            p { "Available routes:" }
+            ul {
+                li { "/" }
+                li { "/blog/[id]" }
+            }
+        }
+    }
+}
+
 /// Shared navbar component.
 #[component]
 fn Navbar() -> Element {
+    println!("🧭 Navbar component rendering");
     rsx! {
         div {
             id: "navbar",
@@ -284,11 +357,15 @@ fn Echo() -> Element {
 
 #[server(EchoServer)]
 async fn echo_server(input: String) -> Result<String, ServerFnError> {
-    Ok(format!("You said: {}", input))
+    println!("📡 Server function called: echo_server with input: '{}'", input);
+    let response = format!("You said: {}", input);
+    println!("📡 echo_server responding: '{}'", response);
+    Ok(response)
 }
 
 #[server(GetRandomCat)]
 async fn get_random_cat() -> Result<String, ServerFnError> {
+    println!("📡 Server function called: get_random_cat");
     // Using The Cat API for random cat images
     let response = reqwest::get("https://api.thecatapi.com/v1/images/search")
         .await
@@ -308,6 +385,7 @@ async fn get_random_cat() -> Result<String, ServerFnError> {
 
 #[server(GenerateBlogContent)]
 async fn generate_blog_content(blog_id: i32) -> Result<(String, String), ServerFnError> {
+    println!("📡 Server function called: generate_blog_content with blog_id: {}", blog_id);
     use markov::Chain;
     
     // Sample corpus for training the Markov chain

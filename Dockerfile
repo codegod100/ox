@@ -17,7 +17,7 @@ RUN cargo binstall dioxus-cli --no-confirm --root /.cargo
 ENV PATH="/.cargo/bin:$PATH"
 
 # Create the final bundle folder. Bundle always executes in release mode with optimizations enabled
-RUN dx bundle --platform server
+RUN dx bundle --platform web
 
 FROM chef AS runtime
 COPY --from=builder /app/target/dx/ox/release/web/ /usr/local/app
