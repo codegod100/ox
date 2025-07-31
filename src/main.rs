@@ -27,6 +27,11 @@ const MAIN_CSS: Asset = asset!("/assets/main.css");
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
 
 fn main() {
+    // Add some debug logging
+    println!("Starting Ox server...");
+    println!("PORT: {}", std::env::var("PORT").unwrap_or_else(|_| "8080".to_string()));
+    println!("IP: {}", std::env::var("IP").unwrap_or_else(|_| "0.0.0.0".to_string()));
+    
     dioxus::launch(App);
 }
 

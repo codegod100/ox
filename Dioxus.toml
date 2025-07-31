@@ -19,3 +19,12 @@ script = []
 # Javascript code file
 # serve: [dev-server] only
 script = []
+
+[bundle]
+identifier = "ox"
+
+[serve]
+# Address to serve on
+addr = "0.0.0.0"
+# Port to serve on  
+port = 8080
