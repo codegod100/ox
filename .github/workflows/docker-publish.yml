@@ -54,9 +54,6 @@ jobs:
             org.opencontainers.image.title=Ox
             org.opencontainers.image.description=Modern Rust web application built with Dioxus
             org.opencontainers.image.vendor=${{ github.repository_owner }}
-      - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@main
-
       - name: Build and push Docker image
         id: build
         uses: docker/build-push-action@v5
