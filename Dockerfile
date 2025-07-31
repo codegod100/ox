@@ -20,7 +20,7 @@ ENV PATH="/.cargo/bin:$PATH"
 RUN dx bundle --platform server
 
 FROM chef AS runtime
-COPY --from=builder /app/target/dx/ox/release/server/ /usr/local/app
+COPY --from=builder /app/target/release/ /usr/local/app
 
 # set our port and make sure to listen for all connections
 ENV PORT=8080
