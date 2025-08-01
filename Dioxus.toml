@@ -3,6 +3,9 @@
 # Configure asset directory to fix 406 issues
 asset_dir = "assets"
 
+[bundle]
+identifier = "ox"
+
 [web.app]
 
 # HTML title tag content
@@ -26,6 +29,5 @@ script = []
 [serve]
 # Address to serve on for development
 addr = "127.0.0.1"
-# Port to serve on  
+# Port to serve on
 port = 8080
-

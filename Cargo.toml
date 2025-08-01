@@ -19,12 +19,11 @@ base64 = "0.21"
 urlencoding = "2.1"
 
 [features]
-default = ["fullstack"]
+default = []
 web = ["dioxus/web"]
-desktop = ["dioxus/desktop"]
-mobile = ["dioxus/mobile"]
 server = ["dioxus/server"]
-fullstack = ["dioxus/fullstack"]
+# desktop = ["dioxus/desktop"]
+# mobile = ["dioxus/mobile"]
 
 [profile]
 
