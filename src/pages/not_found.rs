@@ -8,74 +8,57 @@ pub fn NotFound(segments: Vec<String>) -> Element {
     println!("❌ Segments: {:?}", segments);
 
     rsx! {
-        div {
-            class: "min-h-screen bg-gradient-to-br from-ctp-base via-ctp-mantle to-ctp-crust relative overflow-hidden flex items-center justify-center",
-
-            // Animated background orbs
-            div { class: "absolute inset-0 overflow-hidden pointer-events-none",
-                div { class: "absolute -top-40 -left-40 w-80 h-80 bg-gradient-radial from-ctp-red/15 via-ctp-red/8 to-transparent rounded-full blur-3xl animate-float" }
-                div { class: "absolute -bottom-40 -right-40 w-96 h-96 bg-gradient-radial from-ctp-mauve/10 via-ctp-mauve/5 to-transparent rounded-full blur-3xl animate-float" }
-            }
-
-            div {
-                class: "relative z-10 text-center px-6 max-w-4xl mx-auto",
-                div {
-                    class: "bg-gradient-to-br from-ctp-surface0/70 via-ctp-surface1/50 to-ctp-surface0/70 border border-ctp-surface2/50 backdrop-blur-2xl rounded-3xl p-12 shadow-glass animate-scale-in",
+        div { class: "min-h-screen bg-ctp-base flex items-center justify-center",
+            div { class: "text-center px-6 max-w-lg mx-auto",
+                div { class: "bg-ctp-surface0 border border-ctp-surface1 rounded-lg p-8",
 
                     // 404 Icon
-                    div { class: "text-8xl mb-8 animate-bounce", "🚫" }
+                    div { class: "text-6xl mb-6", "🚫" }
 
-                    h1 {
-                        class: "text-6xl md:text-7xl font-extralight bg-gradient-to-r from-ctp-red via-ctp-mauve to-ctp-red bg-clip-text text-transparent mb-6 tracking-wider",
-                        "404"
-                    }
+                    h1 { class: "text-5xl font-light text-ctp-red mb-4", "404" }
 
-                    h2 {
-                        class: "text-3xl font-light text-ctp-text mb-8 tracking-wide",
-                        "Page Not Found"
-                    }
+                    h2 { class: "text-2xl font-medium text-ctp-text mb-6", "Page Not Found" }
 
-                    p {
-                        class: "text-lg text-ctp-subtext0/80 font-light mb-8 leading-relaxed",
-                        "The requested path '", span { class: "font-mono text-ctp-red", "{path}" }, "' was not found."
-                    }
-
-                    div {
-                        class: "bg-gradient-to-br from-ctp-surface1/60 to-ctp-surface2/40 border border-ctp-surface2/50 backdrop-blur-xl rounded-2xl p-8 mb-10",
-                        h3 {
-                            class: "text-xl font-medium text-ctp-text mb-4 tracking-wide",
-                            "Available routes:"
+                    p { class: "text-ctp-subtext0/70 mb-8 leading-relaxed",
+                        "The requested path '"
+                        span { class: "font-mono text-ctp-red bg-ctp-surface1 px-2 py-1 rounded",
+                            "{path}"
                         }
-                        div {
-                            class: "space-y-3 text-left",
+                        "' was not found."
+                    }
+
+                    div { class: "bg-ctp-surface1/50 rounded-md p-6 mb-8 text-left",
+                        h3 { class: "text-lg font-medium text-ctp-text mb-4", "Available routes:" }
+                        div { class: "space-y-2",
                             div { class: "flex items-center space-x-3",
-                                span { class: "text-ctp-green text-lg", "✓" }
-                                span { class: "font-mono text-ctp-text bg-ctp-base/50 px-3 py-1 rounded-lg", "/" }
-                                span { class: "text-ctp-subtext0/80 font-light", "- Home page" }
+                                span { class: "text-ctp-green", "✓" }
+                                span { class: "font-mono text-sm text-ctp-text bg-ctp-base px-2 py-1 rounded",
+                                    "/"
+                                }
+                                span { class: "text-sm text-ctp-subtext0/70", "- Home page" }
                             }
                             div { class: "flex items-center space-x-3",
-                                span { class: "text-ctp-green text-lg", "✓" }
-                                span { class: "font-mono text-ctp-text bg-ctp-base/50 px-3 py-1 rounded-lg", "/blog/[id]" }
-                                span { class: "text-ctp-subtext0/80 font-light", "- Blog posts" }
+                                span { class: "text-ctp-green", "✓" }
+                                span { class: "font-mono text-sm text-ctp-text bg-ctp-base px-2 py-1 rounded",
+                                    "/blog/[id]"
+                                }
+                                span { class: "text-sm text-ctp-subtext0/70", "- Blog posts" }
                             }
                             div { class: "flex items-center space-x-3",
-                                span { class: "text-ctp-green text-lg", "✓" }
-                                span { class: "font-mono text-ctp-text bg-ctp-base/50 px-3 py-1 rounded-lg", "/tools" }
-                                span { class: "text-ctp-subtext0/80 font-light", "- Developer tools" }
+                                span { class: "text-ctp-green", "✓" }
+                                span { class: "font-mono text-sm text-ctp-text bg-ctp-base px-2 py-1 rounded",
+                                    "/tools"
+                                }
+                                span { class: "text-sm text-ctp-subtext0/70", "- Developer tools" }
                             }
                         }
                     }
 
                     Link {
                         to: crate::types::Route::Home {},
-                        class: "group relative overflow-hidden inline-flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-ctp-mauve/80 to-ctp-blue/60 border border-ctp-mauve/60 backdrop-blur-xl hover:from-ctp-mauve hover:to-ctp-blue text-ctp-base hover:text-ctp-crust transition-all duration-300 rounded-2xl font-medium tracking-wide shadow-glow hover:shadow-glow-lg hover:scale-105",
-
-                        div { class: "absolute inset-0 bg-shimmer-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-500 group-hover:animate-shine" }
-
-                        span { class: "relative z-10 flex items-center space-x-2",
-                            span { class: "text-lg group-hover:-translate-x-1 transition-transform duration-300", "←" }
-                            span { "Back to Home" }
-                        }
+                        class: "inline-flex items-center space-x-2 px-6 py-3 bg-ctp-mauve text-ctp-base hover:bg-ctp-blue transition-colors rounded-md font-medium",
+                        span { "←" }
+                        span { "Back to Home" }
                     }
                 }
             }

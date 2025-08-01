@@ -49,64 +49,51 @@ pub fn Base64Tool(input: Signal<String>, output: Signal<String>) -> Element {
 
     let left_content = rsx! {
         InputSection {
-            label: if mode() == "encode" {
-                "Text to Encode".to_string()
-            } else {
-                "Base64 to Decode".to_string()
-            },
-            helper_text: Some(if mode() == "encode" {
-                "Enter plain text to convert to Base64".to_string()
-            } else {
-                "Enter Base64 string to decode to plain text".to_string()
-            }),
+            label: if mode() == "encode" { "Text to Encode".to_string() } else { "Base64 to Decode".to_string() },
+            helper_text: Some(
+                if mode() == "encode" {
+                    "Enter plain text to convert to Base64".to_string()
+                } else {
+                    "Enter Base64 string to decode to plain text".to_string()
+                },
+            ),
             input: rsx! {
                 ToolTextarea {
                     value: input(),
-                    placeholder: if mode() == "encode" {
-                        "Enter plain text to convert to Base64...".to_string()
-                    } else {
-                        "Enter Base64 string to decode to plain text...".to_string()
-                    },
-                    rows: Some(12),
-                    oninput: Some(EventHandler::new(move |event: FormEvent| {
-                        input.set(event.value());
-                        process_base64(());
-                    })),
+                    placeholder: if mode() == "encode" { "Enter text to encode...".to_string() } else { "Enter Base64 to decode...".to_string() },
+                    rows: Some(6),
+                    oninput: Some(
+                        EventHandler::new(move |event: FormEvent| {
+                            input.set(event.value());
+                            process_base64(());
+                        }),
+                    ),
                 }
-            }
+            },
         }
     };
 
     let right_content = rsx! {
         OutputSection {
-            label: if mode() == "encode" {
-                "Base64 Output".to_string()
-            } else {
-                "Decoded Text".to_string()
-            },
-            helper_text: Some(if mode() == "encode" {
-                "Base64 encoded result".to_string()
-            } else {
-                "Plain text decoded from Base64".to_string()
-            }),
-            copy_button: if !output().is_empty() {
-                Some(rsx! {
-                    CopyButton {
-                        text: output(),
-                        onclick: copy_output
-                    }
-                })
-            } else {
-                None
-            },
+            label: if mode() == "encode" { "Base64 Output".to_string() } else { "Decoded Text".to_string() },
+            helper_text: Some(
+                if mode() == "encode" {
+                    "Base64 encoded result".to_string()
+                } else {
+                    "Plain text decoded from Base64".to_string()
+                },
+            ),
+            copy_button: if !output().is_empty() { Some(rsx! {
+                CopyButton { text: output(), onclick: copy_output }
+            }) } else { None },
             output: rsx! {
                 ToolTextarea {
                     value: output(),
                     placeholder: "Output will appear here...".to_string(),
-                    rows: Some(12),
+                    rows: Some(6),
                     readonly: Some(true),
                 }
-            }
+            },
         }
     };
 
@@ -119,23 +106,19 @@ pub fn Base64Tool(input: Signal<String>, output: Signal<String>) -> Element {
     };
 
     rsx! {
-        div { class: "space-y-8",
+        div { class: "space-y-4",
             // Mode selection
             ModeSelector {
                 current_mode: mode(),
-                modes: modes,
+                modes,
                 on_change: move |new_mode| {
                     mode.set(new_mode);
                     process_base64(());
-                }
+                },
             }
 
             // Main tool grid
-            ToolGrid {
-                left_content: left_content,
-                right_content: right_content,
-                actions: Some(actions),
-            }
+            ToolGrid { left_content, right_content, actions: Some(actions) }
         }
     }
 }

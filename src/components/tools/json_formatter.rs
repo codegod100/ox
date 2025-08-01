@@ -49,43 +49,38 @@ pub fn JsonFormatter(
     let left_content = rsx! {
         InputSection {
             label: "Input JSON".to_string(),
-            helper_text: Some("Paste your JSON here to format and validate".to_string()),
+            helper_text: Some("Paste JSON to format & validate".to_string()),
             input: rsx! {
                 ToolTextarea {
                     value: input(),
-                    placeholder: "Paste your JSON here...".to_string(),
-                    rows: Some(12),
-                    oninput: Some(EventHandler::new(move |event: FormEvent| {
-                        input.set(event.value());
-                        format_json(());
-                    })),
+                    placeholder: "Paste JSON here...".to_string(),
+                    rows: Some(6),
+                    oninput: Some(
+                        EventHandler::new(move |event: FormEvent| {
+                            input.set(event.value());
+                            format_json(());
+                        }),
+                    ),
                 }
-            }
+            },
         }
     };
 
     let right_content = rsx! {
         OutputSection {
             label: "Formatted JSON".to_string(),
-            helper_text: Some("Formatted and validated JSON output".to_string()),
-            copy_button: if !output().is_empty() {
-                Some(rsx! {
-                    CopyButton {
-                        text: output(),
-                        onclick: copy_output
-                    }
-                })
-            } else {
-                None
-            },
+            helper_text: Some("Formatted & validated output".to_string()),
+            copy_button: if !output().is_empty() { Some(rsx! {
+                CopyButton { text: output(), onclick: copy_output }
+            }) } else { None },
             output: rsx! {
                 ToolTextarea {
                     value: output(),
                     placeholder: "Formatted JSON will appear here...".to_string(),
-                    rows: Some(12),
+                    rows: Some(6),
                     readonly: Some(true),
                 }
-            }
+            },
         }
     };
 
@@ -99,8 +94,8 @@ pub fn JsonFormatter(
 
     rsx! {
         ToolGrid {
-            left_content: left_content,
-            right_content: right_content,
+            left_content,
+            right_content,
             actions: Some(actions),
             error_message: Some(error()),
         }

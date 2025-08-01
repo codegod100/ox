@@ -34,18 +34,20 @@ pub fn TextUtilities(
     let left_content = rsx! {
         InputSection {
             label: "Input Text".to_string(),
-            helper_text: Some("Enter or paste your text to transform and analyze".to_string()),
+            helper_text: Some("Enter text to analyze & transform".to_string()),
             input: rsx! {
                 ToolTextarea {
                     value: input(),
-                    placeholder: "Enter your text here...".to_string(),
-                    rows: Some(12),
-                    oninput: Some(EventHandler::new(move |event: FormEvent| {
-                        input.set(event.value());
-                        update_counts();
-                    })),
+                    placeholder: "Enter text here...".to_string(),
+                    rows: Some(6),
+                    oninput: Some(
+                        EventHandler::new(move |event: FormEvent| {
+                            input.set(event.value());
+                            update_counts();
+                        }),
+                    ),
                 }
-            }
+            },
         }
     };
 
@@ -53,19 +55,11 @@ pub fn TextUtilities(
         OutputSection {
             label: "Text Statistics".to_string(),
             helper_text: Some("Real-time analysis of your text".to_string()),
-            copy_button: if !input().is_empty() {
-                Some(rsx! {
-                    CopyButton {
-                        text: input(),
-                        onclick: copy_text
-                    }
-                })
-            } else {
-                None
-            },
+            copy_button: if !input().is_empty() { Some(rsx! {
+                CopyButton { text: input(), onclick: copy_text }
+            }) } else { None },
             output: rsx! {
                 div { class: "h-full bg-ctp-base border border-ctp-surface2 rounded-md p-4 space-y-4",
-
                     // Main statistics
                     div { class: "grid grid-cols-2 gap-4",
                         div { class: "text-center p-4 bg-ctp-surface0 rounded-md",
@@ -77,7 +71,6 @@ pub fn TextUtilities(
                             div { class: "text-sm text-ctp-subtext1", "Words" }
                         }
                     }
-
                     // Additional text metrics
                     if !input().is_empty() {
                         div { class: "pt-4 border-t border-ctp-surface2 space-y-3",
@@ -103,7 +96,11 @@ pub fn TextUtilities(
                                     span { class: "text-ctp-text font-medium",
                                         {
                                             if word_count() > 0 {
-                                                format!("{:.1}", input().chars().filter(|c| !c.is_whitespace()).count() as f32 / word_count() as f32)
+                                                format!(
+                                                    "{:.1}",
+                                                    input().chars().filter(|c| !c.is_whitespace()).count() as f32
+                                                        / word_count() as f32,
+                                                )
                                             } else {
                                                 "0".to_string()
                                             }
@@ -120,7 +117,7 @@ pub fn TextUtilities(
                         }
                     }
                 }
-            }
+            },
         }
     };
 
@@ -133,20 +130,15 @@ pub fn TextUtilities(
     };
 
     rsx! {
-        div { class: "space-y-8",
+        div { class: "space-y-4",
             // Main tool grid
-            ToolGrid {
-                left_content: left_content,
-                right_content: right_content,
-                actions: Some(actions),
-            }
+            ToolGrid { left_content, right_content, actions: Some(actions) }
 
             // Text transformation tools
-            div { class: "bg-ctp-surface0 border border-ctp-surface2 rounded-md p-6",
-                h3 { class: "text-lg font-medium text-ctp-text mb-4 text-center", "Text Transformations" }
-                div { class: "grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto",
+            div { class: "border-t border-ctp-surface1 pt-4",
+                div { class: "grid grid-cols-3 gap-2",
                     ActionButton {
-                        text: "UPPERCASE".to_string(),
+                        text: "UPPER".to_string(),
                         onclick: move |_| {
                             input.set(input().to_uppercase());
                             update_counts();
@@ -155,7 +147,7 @@ pub fn TextUtilities(
                         disabled: Some(input().is_empty()),
                     }
                     ActionButton {
-                        text: "lowercase".to_string(),
+                        text: "lower".to_string(),
                         onclick: move |_| {
                             input.set(input().to_lowercase());
                             update_counts();
@@ -164,7 +156,7 @@ pub fn TextUtilities(
                         disabled: Some(input().is_empty()),
                     }
                     ActionButton {
-                        text: "Title Case".to_string(),
+                        text: "Title".to_string(),
                         onclick: move |_| {
                             let title_case: String = input()
                                 .split_whitespace()

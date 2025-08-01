@@ -15,21 +15,19 @@ pub struct ToolGridProps {
     success_message: Option<String>,
 }
 
-/// Standard grid layout for tool inputs and outputs with modern glassmorphism
+/// Standard grid layout for tool inputs and outputs
 #[component]
 pub fn ToolGrid(props: ToolGridProps) -> Element {
     rsx! {
         div { class: "space-y-8",
 
-            // Error/Success messages with modern styling
+            // Error/Success messages
             if let Some(error) = props.error_message {
                 if !error.is_empty() {
-                    div {
-                        class: "relative overflow-hidden p-6 bg-gradient-to-r from-ctp-red/20 via-ctp-red/10 to-ctp-red/20 border border-ctp-red/40 backdrop-blur-xl text-ctp-red rounded-2xl shadow-lg animate-slide-in",
-                        div { class: "absolute inset-0 bg-gradient-to-r from-ctp-red/5 to-transparent" }
-                        div { class: "relative z-10 flex items-center space-x-3",
-                            div { class: "text-2xl animate-pulse", "❌" }
-                            span { class: "font-medium tracking-wide", "{error}" }
+                    div { class: "p-4 bg-ctp-red/10 border border-ctp-red/40 text-ctp-red rounded-md animate-fade-in",
+                        div { class: "flex items-center space-x-2",
+                            span { "❌" }
+                            span { "{error}" }
                         }
                     }
                 }
@@ -37,35 +35,29 @@ pub fn ToolGrid(props: ToolGridProps) -> Element {
 
             if let Some(success) = props.success_message {
                 if !success.is_empty() {
-                    div {
-                        class: "relative overflow-hidden p-6 bg-gradient-to-r from-ctp-green/20 via-ctp-green/10 to-ctp-green/20 border border-ctp-green/40 backdrop-blur-xl text-ctp-green rounded-2xl shadow-lg animate-slide-in",
-                        div { class: "absolute inset-0 bg-gradient-to-r from-ctp-green/5 to-transparent" }
-                        div { class: "relative z-10 flex items-center space-x-3",
-                            div { class: "text-2xl animate-pulse", "✅" }
-                            span { class: "font-medium tracking-wide", "{success}" }
+                    div { class: "p-4 bg-ctp-green/10 border border-ctp-green/40 text-ctp-green rounded-md animate-fade-in",
+                        div { class: "flex items-center space-x-2",
+                            span { "✅" }
+                            span { "{success}" }
                         }
                     }
                 }
             }
 
-            // Main grid layout - responsive 2-column grid with enhanced styling
-            div {
-                class: "grid grid-cols-1 xl:grid-cols-2 gap-12 items-start",
+            // Main grid layout - responsive 2-column for larger tools
+            div { class: "grid grid-cols-1 lg:grid-cols-2 gap-6",
 
-                // Left column (Input)
-                div { class: "space-y-4 animate-slide-in", {props.left_content} }
+                // Input section
+                div { class: "space-y-4", {props.left_content} }
 
-                // Right column (Output)
-                div { class: "space-y-4 animate-slide-in", {props.right_content} }
+                // Output section  
+                div { class: "space-y-4", {props.right_content} }
             }
 
-            // Actions row with glassmorphism
+            // Actions row
             if let Some(actions) = props.actions {
-                div {
-                    class: "flex gap-6 justify-center pt-8 mt-8 border-t border-ctp-surface2/30 backdrop-blur-sm",
-                    div { class: "flex flex-wrap gap-4 justify-center",
-                        {actions}
-                    }
+                div { class: "flex flex-wrap gap-3 justify-center pt-4 mt-4 border-t border-ctp-surface1/50",
+                    {actions}
                 }
             }
         }
@@ -83,26 +75,16 @@ pub struct InputSectionProps {
     helper_text: Option<String>,
 }
 
-/// Standard input section with modern styling
+/// Standard input section
 #[component]
 pub fn InputSection(props: InputSectionProps) -> Element {
     rsx! {
-        div { class: "space-y-4 group",
-            label {
-                class: "block text-lg font-medium text-ctp-text tracking-wide group-hover:text-ctp-mauve transition-colors duration-300",
-                "{props.label}"
-            }
-            div { class: "relative",
-                {props.input}
-                // Subtle glow effect
-                div { class: "absolute inset-0 bg-gradient-to-r from-ctp-mauve/5 via-transparent to-ctp-blue/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" }
-            }
+        div { class: "space-y-4",
+            label { class: "block text-base font-medium text-ctp-text mb-2", "{props.label}" }
+            {props.input}
             if let Some(helper) = props.helper_text {
                 if !helper.is_empty() {
-                    p {
-                        class: "text-sm text-ctp-subtext0/80 font-light tracking-wide leading-relaxed",
-                        "{helper}"
-                    }
+                    p { class: "text-sm text-ctp-subtext0/70 mt-2", "{helper}" }
                 }
             }
         }
@@ -122,40 +104,28 @@ pub struct OutputSectionProps {
     helper_text: Option<String>,
 }
 
-/// Standard output section with modern styling and copy functionality
+/// Standard output section with copy functionality
 #[component]
 pub fn OutputSection(props: OutputSectionProps) -> Element {
     rsx! {
-        div { class: "space-y-4 group",
-            div { class: "flex justify-between items-center",
-                label {
-                    class: "block text-lg font-medium text-ctp-text tracking-wide group-hover:text-ctp-blue transition-colors duration-300",
-                    "{props.label}"
-                }
+        div { class: "space-y-4",
+            div { class: "flex justify-between items-center mb-2",
+                label { class: "block text-base font-medium text-ctp-text", "{props.label}" }
                 if let Some(copy_btn) = props.copy_button {
-                    div { class: "animate-fade-in",
-                        {copy_btn}
-                    }
+                    {copy_btn}
                 }
             }
-            div { class: "relative",
-                {props.output}
-                // Success indicator glow
-                div { class: "absolute inset-0 bg-gradient-to-r from-ctp-blue/5 via-transparent to-ctp-teal/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" }
-            }
+            {props.output}
             if let Some(helper) = props.helper_text {
                 if !helper.is_empty() {
-                    p {
-                        class: "text-sm text-ctp-subtext0/80 font-light tracking-wide leading-relaxed",
-                        "{helper}"
-                    }
+                    p { class: "text-sm text-ctp-subtext0/70 mt-2", "{helper}" }
                 }
             }
         }
     }
 }
 
-/// Modern textarea component with glassmorphism styling
+/// Clean textarea component
 #[component]
 pub fn ToolTextarea(
     value: String,
@@ -167,34 +137,30 @@ pub fn ToolTextarea(
     let rows = rows.unwrap_or(12);
     let readonly = readonly.unwrap_or(false);
 
-    let base_classes = "w-full resize-none font-mono text-base leading-relaxed bg-gradient-to-br from-ctp-base/80 to-ctp-surface0/60 border border-ctp-surface2/50 backdrop-blur-xl rounded-2xl p-6 text-ctp-text placeholder-ctp-subtext0/60 transition-all duration-500 focus:border-ctp-mauve/60 focus:shadow-glow focus:bg-ctp-base/90 focus:outline-none";
+    let base_classes = "w-full resize-none font-mono text-sm bg-ctp-base border border-ctp-surface2 rounded-md p-4 text-ctp-text placeholder-ctp-subtext0 transition-colors focus:border-ctp-mauve focus:outline-none h-40";
     let readonly_classes = if readonly {
-        " cursor-default bg-ctp-surface0/40"
+        " cursor-default bg-ctp-surface0"
     } else {
-        " hover:border-ctp-text/40"
+        ""
     };
 
     rsx! {
-        div { class: "relative group",
-            textarea {
-                class: "{base_classes}{readonly_classes}",
-                rows: "{rows}",
-                readonly: readonly,
-                placeholder: "{placeholder}",
-                value: "{value}",
-                oninput: move |event| {
-                    if let Some(handler) = oninput {
-                        handler.call(event);
-                    }
-                },
-            }
-            // Subtle border glow effect
-            div { class: "absolute inset-0 bg-gradient-to-r from-ctp-mauve/10 via-ctp-blue/10 to-ctp-teal/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none blur-sm" }
+        textarea {
+            class: "{base_classes}{readonly_classes}",
+            rows: "{rows}",
+            readonly,
+            placeholder: "{placeholder}",
+            value: "{value}",
+            oninput: move |event| {
+                if let Some(handler) = oninput {
+                    handler.call(event);
+                }
+            },
         }
     }
 }
 
-/// Modern input component with glassmorphism styling
+/// Clean input component
 #[component]
 pub fn ToolInput(
     value: String,
@@ -205,44 +171,34 @@ pub fn ToolInput(
     let input_type = input_type.unwrap_or_else(|| "text".to_string());
 
     rsx! {
-        div { class: "relative group",
-            input {
-                r#type: "{input_type}",
-                class: "w-full px-6 py-4 bg-gradient-to-br from-ctp-base/80 to-ctp-surface0/60 border border-ctp-surface2/50 backdrop-blur-xl rounded-2xl text-ctp-text text-lg placeholder-ctp-subtext0/60 transition-all duration-500 focus:outline-none focus:border-ctp-mauve/60 focus:shadow-glow focus:bg-ctp-base/90 hover:border-ctp-text/40",
-                placeholder: "{placeholder}",
-                value: "{value}",
-                oninput: move |event| {
-                    if let Some(handler) = oninput {
-                        handler.call(event);
-                    }
-                },
-            }
-            // Floating border effect
-            div { class: "absolute inset-0 bg-gradient-to-r from-ctp-mauve/10 via-ctp-blue/10 to-ctp-teal/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none blur-sm" }
+        input {
+            r#type: "{input_type}",
+            class: "w-full px-6 py-4 bg-ctp-base border border-ctp-surface2 rounded-md text-ctp-text placeholder-ctp-subtext0 transition-colors focus:outline-none focus:border-ctp-mauve",
+            placeholder: "{placeholder}",
+            value: "{value}",
+            oninput: move |event| {
+                if let Some(handler) = oninput {
+                    handler.call(event);
+                }
+            },
         }
     }
 }
 
-/// Modern copy button with sleek glassmorphism styling
+/// Simple copy button
 #[component]
 pub fn CopyButton(text: String, onclick: EventHandler<MouseEvent>) -> Element {
     rsx! {
         button {
-            class: "group relative overflow-hidden px-6 py-3 bg-gradient-to-r from-ctp-surface1/60 to-ctp-surface2/40 border border-ctp-surface2/50 backdrop-blur-xl hover:border-ctp-mauve/60 text-ctp-text hover:text-ctp-mauve transition-all duration-300 rounded-xl font-medium tracking-wide shadow-lg hover:shadow-glow hover:scale-105",
+            class: "px-3 py-2 bg-ctp-surface1 hover:bg-ctp-surface2 text-ctp-text text-sm rounded-md transition-colors flex items-center space-x-2 border border-ctp-surface2 hover:border-ctp-mauve",
             onclick: move |event| onclick.call(event),
-
-            // Shine effect
-            div { class: "absolute inset-0 bg-shimmer-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-500 group-hover:animate-shine" }
-
-            span { class: "relative z-10 flex items-center space-x-2",
-                span { class: "text-lg", "📋" }
-                span { "Copy" }
-            }
+            span { "📋" }
+            span { "Copy" }
         }
     }
 }
 
-/// Modern action button with variant styling and glassmorphism
+/// Simple action button with variants
 #[component]
 pub fn ActionButton(
     text: String,
@@ -256,23 +212,23 @@ pub fn ActionButton(
     let button_class = match variant.as_str() {
         "primary" => {
             if disabled {
-                "group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-ctp-surface2/50 to-ctp-surface1/50 border border-ctp-surface2/30 backdrop-blur-xl text-ctp-subtext0/50 cursor-not-allowed rounded-2xl font-medium tracking-wide transition-all duration-300"
+                "px-4 py-2 bg-ctp-surface2 text-ctp-subtext0 cursor-not-allowed rounded-md transition-colors"
             } else {
-                "group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-ctp-mauve/80 to-ctp-blue/60 border border-ctp-mauve/60 backdrop-blur-xl hover:from-ctp-mauve hover:to-ctp-blue text-ctp-base hover:text-ctp-crust transition-all duration-300 rounded-2xl font-medium tracking-wide shadow-glow hover:shadow-glow-lg hover:scale-105"
+                "px-4 py-2 bg-ctp-mauve hover:bg-ctp-blue text-ctp-base rounded-md transition-colors"
             }
         }
         "danger" => {
             if disabled {
-                "group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-ctp-surface2/50 to-ctp-surface1/50 border border-ctp-surface2/30 backdrop-blur-xl text-ctp-subtext0/50 cursor-not-allowed rounded-2xl font-medium tracking-wide transition-all duration-300"
+                "px-4 py-2 bg-ctp-surface2 text-ctp-subtext0 cursor-not-allowed rounded-md transition-colors"
             } else {
-                "group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-ctp-red/80 to-ctp-maroon/60 border border-ctp-red/60 backdrop-blur-xl hover:from-ctp-red hover:to-ctp-maroon text-ctp-base hover:text-ctp-crust transition-all duration-300 rounded-2xl font-medium tracking-wide shadow-lg hover:shadow-xl hover:scale-105"
+                "px-4 py-2 bg-ctp-red hover:bg-ctp-red/80 text-ctp-base rounded-md transition-colors"
             }
         }
         _ => {
             if disabled {
-                "group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-ctp-surface2/50 to-ctp-surface1/50 border border-ctp-surface2/30 backdrop-blur-xl text-ctp-subtext0/50 cursor-not-allowed rounded-2xl font-medium tracking-wide transition-all duration-300"
+                "px-4 py-2 bg-ctp-surface2 text-ctp-subtext0 cursor-not-allowed rounded-md transition-colors"
             } else {
-                "group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-ctp-surface1/60 to-ctp-surface2/40 border border-ctp-surface2/50 backdrop-blur-xl hover:border-ctp-text/60 text-ctp-text hover:text-ctp-mauve transition-all duration-300 rounded-2xl font-medium tracking-wide shadow-lg hover:shadow-glow hover:scale-105"
+                "px-4 py-2 bg-ctp-surface1 hover:bg-ctp-surface2 text-ctp-text rounded-md transition-colors"
             }
         }
     };
@@ -280,48 +236,27 @@ pub fn ActionButton(
     rsx! {
         button {
             class: "{button_class}",
-            disabled: disabled,
+            disabled,
             onclick: move |event| {
                 if !disabled {
                     onclick.call(event);
                 }
             },
-
-            // Shine effect for non-disabled buttons
-            if !disabled {
-                div { class: "absolute inset-0 bg-shimmer-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-500 group-hover:animate-shine" }
-            }
-
-            span { class: "relative z-10", "{text}" }
+            "{text}"
         }
     }
 }
 
-/// Modern statistics display with glassmorphism and animations
+/// Simple statistics display
 #[component]
 pub fn StatsDisplay(stats: Vec<(String, String)>) -> Element {
     rsx! {
-        div {
-            class: "relative overflow-hidden bg-gradient-to-br from-ctp-surface0/60 via-ctp-surface1/40 to-ctp-surface0/60 border border-ctp-surface2/50 backdrop-blur-xl rounded-2xl p-8 shadow-glass animate-scale-in",
-
-            // Background glow
-            div { class: "absolute inset-0 bg-gradient-to-r from-ctp-mauve/5 via-ctp-blue/5 to-ctp-teal/5 opacity-50" }
-
-            div {
-                class: "relative z-10 flex flex-wrap gap-8 justify-center",
-                for (i, (label, value)) in stats.into_iter().enumerate() {
-                    div {
-                        key: "{i}",
-                        class: "group text-center animate-fade-in",
-                        style: "animation-delay: {i * 100}ms",
-
-                        div { class: "text-sm text-ctp-subtext1/80 font-light tracking-wide uppercase mb-2",
-                            "{label}"
-                        }
-                        div { class: "text-2xl font-medium text-ctp-text group-hover:text-ctp-mauve transition-colors duration-300 tracking-wide",
-                            "{value}"
-                        }
-                        div { class: "w-8 h-0.5 bg-gradient-to-r from-ctp-mauve to-ctp-blue rounded-full mx-auto mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" }
+        div { class: "bg-ctp-surface0 border border-ctp-surface1 rounded-md p-4",
+            div { class: "flex flex-wrap gap-6 justify-center",
+                for (i , (label , value)) in stats.into_iter().enumerate() {
+                    div { key: "{i}", class: "text-center",
+                        div { class: "text-sm text-ctp-subtext0 uppercase mb-1", "{label}" }
+                        div { class: "text-lg font-medium text-ctp-text", "{value}" }
                     }
                 }
             }
@@ -329,7 +264,7 @@ pub fn StatsDisplay(stats: Vec<(String, String)>) -> Element {
     }
 }
 
-/// Modern mode selector with sleek toggle styling
+/// Simple mode selector
 #[component]
 pub fn ModeSelector(
     current_mode: String,
@@ -337,28 +272,15 @@ pub fn ModeSelector(
     on_change: EventHandler<String>,
 ) -> Element {
     rsx! {
-        div { class: "space-y-6 text-center",
-            label {
-                class: "block text-lg font-medium text-ctp-text tracking-wide",
-                "Operation Mode"
-            }
-            div { class: "inline-flex gap-2 p-2 bg-gradient-to-r from-ctp-surface0/60 to-ctp-surface1/40 border border-ctp-surface2/50 backdrop-blur-xl rounded-2xl shadow-inner-glow",
-                for (mode_value, mode_label) in modes {
+        div { class: "space-y-3 text-center",
+            label { class: "block text-sm font-medium text-ctp-text", "Operation Mode" }
+            div { class: "inline-flex gap-1 p-1 bg-ctp-surface0 border border-ctp-surface1 rounded-md",
+                for (mode_value , mode_label) in modes {
                     button {
                         key: "{mode_value}",
-                        class: if current_mode == mode_value {
-                            "relative px-6 py-3 bg-gradient-to-r from-ctp-mauve to-ctp-blue text-ctp-base font-medium rounded-xl shadow-glow transition-all duration-300 scale-105"
-                        } else {
-                            "relative px-6 py-3 text-ctp-text hover:text-ctp-mauve font-medium rounded-xl transition-all duration-300 hover:bg-ctp-surface1/40"
-                        },
+                        class: if current_mode == mode_value { "px-3 py-2 bg-ctp-mauve text-ctp-base font-medium rounded-sm transition-colors" } else { "px-3 py-2 text-ctp-text hover:text-ctp-mauve font-medium rounded-sm transition-colors hover:bg-ctp-surface1" },
                         onclick: move |_| on_change.call(mode_value.clone()),
-
-                        // Active state shine effect
-                        if current_mode == mode_value {
-                            div { class: "absolute inset-0 bg-shimmer-gradient opacity-30 rounded-xl animate-shine" }
-                        }
-
-                        span { class: "relative z-10", "{mode_label}" }
+                        "{mode_label}"
                     }
                 }
             }
