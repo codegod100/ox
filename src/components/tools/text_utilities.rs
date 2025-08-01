@@ -1,3 +1,4 @@
+use crate::components::tools::shared::*;
 use dioxus::prelude::*;
 
 /// Text Utilities component
@@ -18,71 +19,152 @@ pub fn TextUtilities(
         word_count.set(words as i32);
     };
 
-    rsx! {
-        div {
-            class: "space-y-16",
+    let copy_text = move |_| {
+        if !input().is_empty() {
+            // TODO: Implement actual clipboard functionality
+            println!("📋 Copied text to clipboard");
+        }
+    };
 
-            // Input section
-            div {
-                class: "space-y-2",
-                label {
-                    class: "block text-sm font-medium text-ctp-subtext1",
-                    "Input Text"
-                }
-                textarea {
-                    class: "w-full px-4 py-3 bg-ctp-base border border-ctp-surface2 text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-text resize-none",
-                    rows: "8",
-                    placeholder: "Enter your text here...",
-                    value: "{input}",
-                    oninput: move |event| {
+    let clear_all = move |_| {
+        input.set(String::new());
+        update_counts();
+    };
+
+    let left_content = rsx! {
+        InputSection {
+            label: "Input Text".to_string(),
+            helper_text: Some("Enter or paste your text to transform and analyze".to_string()),
+            input: rsx! {
+                ToolTextarea {
+                    value: input(),
+                    placeholder: "Enter your text here...".to_string(),
+                    rows: Some(12),
+                    oninput: Some(EventHandler::new(move |event: FormEvent| {
                         input.set(event.value());
                         update_counts();
+                    })),
+                }
+            }
+        }
+    };
+
+    let right_content = rsx! {
+        OutputSection {
+            label: "Text Statistics".to_string(),
+            helper_text: Some("Real-time analysis of your text".to_string()),
+            copy_button: if !input().is_empty() {
+                Some(rsx! {
+                    CopyButton {
+                        text: input(),
+                        onclick: copy_text
+                    }
+                })
+            } else {
+                None
+            },
+            output: rsx! {
+                div { class: "h-full bg-ctp-base border border-ctp-surface2 rounded-md p-4 space-y-4",
+
+                    // Main statistics
+                    div { class: "grid grid-cols-2 gap-4",
+                        div { class: "text-center p-4 bg-ctp-surface0 rounded-md",
+                            div { class: "text-2xl font-bold text-ctp-text", "{char_count}" }
+                            div { class: "text-sm text-ctp-subtext1", "Characters" }
+                        }
+                        div { class: "text-center p-4 bg-ctp-surface0 rounded-md",
+                            div { class: "text-2xl font-bold text-ctp-text", "{word_count}" }
+                            div { class: "text-sm text-ctp-subtext1", "Words" }
+                        }
+                    }
+
+                    // Additional text metrics
+                    if !input().is_empty() {
+                        div { class: "pt-4 border-t border-ctp-surface2 space-y-3",
+                            div { class: "grid grid-cols-1 gap-2 text-sm",
+                                div { class: "flex justify-between",
+                                    span { class: "text-ctp-subtext1", "Lines:" }
+                                    span { class: "text-ctp-text font-medium", "{input().lines().count()}" }
+                                }
+                                div { class: "flex justify-between",
+                                    span { class: "text-ctp-subtext1", "Paragraphs:" }
+                                    span { class: "text-ctp-text font-medium",
+                                        "{input().split(\"\\n\\n\").filter(|p| !p.trim().is_empty()).count()}"
+                                    }
+                                }
+                                div { class: "flex justify-between",
+                                    span { class: "text-ctp-subtext1", "Characters (no spaces):" }
+                                    span { class: "text-ctp-text font-medium",
+                                        "{input().chars().filter(|c| !c.is_whitespace()).count()}"
+                                    }
+                                }
+                                div { class: "flex justify-between",
+                                    span { class: "text-ctp-subtext1", "Average word length:" }
+                                    span { class: "text-ctp-text font-medium",
+                                        {
+                                            if word_count() > 0 {
+                                                format!("{:.1}", input().chars().filter(|c| !c.is_whitespace()).count() as f32 / word_count() as f32)
+                                            } else {
+                                                "0".to_string()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        div { class: "text-center text-ctp-subtext0 py-8",
+                            div { class: "text-4xl mb-4 opacity-50", "📊" }
+                            div { class: "text-sm", "Statistics will appear here" }
+                            div { class: "text-xs mt-2", "Enter text to see analysis" }
+                        }
                     }
                 }
             }
+        }
+    };
 
-            // Stats section
-            div {
-                class: "flex gap-8 justify-center py-3 px-4 bg-ctp-base border border-ctp-surface2",
-                div {
-                    class: "text-sm text-ctp-subtext1",
-                    "Characters: "
-                    span { class: "font-medium text-ctp-text", "{char_count}" }
-                }
-                div {
-                    class: "text-sm text-ctp-subtext1",
-                    "Words: "
-                    span { class: "font-medium text-ctp-text", "{word_count}" }
-                }
+    let actions = rsx! {
+        ActionButton {
+            text: "Clear All".to_string(),
+            onclick: clear_all,
+            variant: Some("secondary".to_string()),
+        }
+    };
+
+    rsx! {
+        div { class: "space-y-8",
+            // Main tool grid
+            ToolGrid {
+                left_content: left_content,
+                right_content: right_content,
+                actions: Some(actions),
             }
 
-            // Transform actions
-            div {
-                class: "space-y-3",
-                label {
-                    class: "block text-sm font-medium text-ctp-subtext1",
-                    "Text Transformations"
-                }
-                div {
-                    class: "flex gap-8 justify-center flex-wrap",
-                    button {
-                        class: "px-6 py-3 bg-ctp-surface2 hover:bg-ctp-surface0 text-ctp-text transition-colors",
+            // Text transformation tools
+            div { class: "bg-ctp-surface0 border border-ctp-surface2 rounded-md p-6",
+                h3 { class: "text-lg font-medium text-ctp-text mb-4 text-center", "Text Transformations" }
+                div { class: "grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto",
+                    ActionButton {
+                        text: "UPPERCASE".to_string(),
                         onclick: move |_| {
                             input.set(input().to_uppercase());
                             update_counts();
                         },
-                        "UPPERCASE"
+                        variant: Some("secondary".to_string()),
+                        disabled: Some(input().is_empty()),
                     }
-                    button {
-                        class: "px-6 py-3 bg-ctp-surface2 hover:bg-ctp-surface0 text-ctp-text transition-colors",
+                    ActionButton {
+                        text: "lowercase".to_string(),
                         onclick: move |_| {
                             input.set(input().to_lowercase());
                             update_counts();
                         },
-                        "lowercase"
+                        variant: Some("secondary".to_string()),
+                        disabled: Some(input().is_empty()),
                     }
-                    button {
-                        class: "px-6 py-3 bg-ctp-surface2 hover:bg-ctp-surface0 text-ctp-text transition-colors",
+                    ActionButton {
+                        text: "Title Case".to_string(),
                         onclick: move |_| {
                             let title_case: String = input()
                                 .split_whitespace()
@@ -98,29 +180,8 @@ pub fn TextUtilities(
                             input.set(title_case);
                             update_counts();
                         },
-                        "Title Case"
-                    }
-                }
-            }
-
-            // Actions
-            div {
-                class: "flex gap-8 justify-center pt-12",
-                button {
-                    class: "btn-secondary",
-                    onclick: move |_| {
-                        input.set(String::new());
-                        update_counts();
-                    },
-                    "Clear"
-                }
-                if !input().is_empty() {
-                    button {
-                        class: "px-3 py-1 text-xs bg-ctp-surface2 hover:bg-ctp-surface0 text-ctp-text transition-colors",
-                        onclick: move |_| {
-                            println!("📋 Copied text to clipboard");
-                        },
-                        "Copy"
+                        variant: Some("secondary".to_string()),
+                        disabled: Some(input().is_empty()),
                     }
                 }
             }

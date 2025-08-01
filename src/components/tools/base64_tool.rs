@@ -1,3 +1,4 @@
+use crate::components::tools::shared::*;
 use base64::{engine::general_purpose, Engine as _};
 use dioxus::prelude::*;
 
@@ -29,107 +30,111 @@ pub fn Base64Tool(input: Signal<String>, output: Signal<String>) -> Element {
         }
     };
 
-    rsx! {
-        div {
-            class: "space-y-16",
+    let clear_all = move |_| {
+        input.set(String::new());
+        output.set(String::new());
+    };
 
-            // Mode selection
-            div {
-                class: "space-y-3",
-                label {
-                    class: "block text-sm font-medium text-ctp-subtext1",
-                    "Operation Mode"
-                }
-                div {
-                    class: "flex gap-6 justify-center",
-                    button {
-                        class: if mode() == "encode" {
-                            "px-6 py-3 bg-ctp-surface2 text-ctp-text transition-colors"
-                        } else {
-                            "px-6 py-3 bg-ctp-base border border-ctp-surface2 text-ctp-subtext0 hover:text-ctp-text transition-colors"
-                        },
-                        onclick: move |_| {
-                            mode.set("encode".to_string());
-                            process_base64(());
-                        },
-                        "Encode"
-                    }
-                    button {
-                        class: if mode() == "decode" {
-                            "px-6 py-3 bg-ctp-surface2 text-ctp-text transition-colors"
-                        } else {
-                            "px-6 py-3 bg-ctp-base border border-ctp-surface2 text-ctp-subtext0 hover:text-ctp-text transition-colors"
-                        },
-                        onclick: move |_| {
-                            mode.set("decode".to_string());
-                            process_base64(());
-                        },
-                        "Decode"
-                    }
-                }
-            }
+    let copy_output = move |_| {
+        if !output().is_empty() {
+            // TODO: Implement actual clipboard functionality
+            println!("📋 Copied Base64 result to clipboard");
+        }
+    };
 
-            // Input section
-            div {
-                class: "space-y-2",
-                label {
-                    class: "block text-sm font-medium text-ctp-subtext1",
-                    if mode() == "encode" { "Text to Encode" } else { "Base64 to Decode" }
-                }
-                textarea {
-                    class: "w-full px-4 py-3 bg-ctp-base border border-ctp-surface2 text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-text resize-none",
-                    rows: "6",
+    let modes = vec![
+        ("encode".to_string(), "Encode".to_string()),
+        ("decode".to_string(), "Decode".to_string()),
+    ];
+
+    let left_content = rsx! {
+        InputSection {
+            label: if mode() == "encode" {
+                "Text to Encode".to_string()
+            } else {
+                "Base64 to Decode".to_string()
+            },
+            helper_text: Some(if mode() == "encode" {
+                "Enter plain text to convert to Base64".to_string()
+            } else {
+                "Enter Base64 string to decode to plain text".to_string()
+            }),
+            input: rsx! {
+                ToolTextarea {
+                    value: input(),
                     placeholder: if mode() == "encode" {
-                        "Enter plain text to convert to Base64..."
+                        "Enter plain text to convert to Base64...".to_string()
                     } else {
-                        "Enter Base64 string to decode to plain text..."
+                        "Enter Base64 string to decode to plain text...".to_string()
                     },
-                    value: "{input}",
-                    oninput: move |event| {
+                    rows: Some(12),
+                    oninput: Some(EventHandler::new(move |event: FormEvent| {
                         input.set(event.value());
                         process_base64(());
+                    })),
+                }
+            }
+        }
+    };
+
+    let right_content = rsx! {
+        OutputSection {
+            label: if mode() == "encode" {
+                "Base64 Output".to_string()
+            } else {
+                "Decoded Text".to_string()
+            },
+            helper_text: Some(if mode() == "encode" {
+                "Base64 encoded result".to_string()
+            } else {
+                "Plain text decoded from Base64".to_string()
+            }),
+            copy_button: if !output().is_empty() {
+                Some(rsx! {
+                    CopyButton {
+                        text: output(),
+                        onclick: copy_output
                     }
+                })
+            } else {
+                None
+            },
+            output: rsx! {
+                ToolTextarea {
+                    value: output(),
+                    placeholder: "Output will appear here...".to_string(),
+                    rows: Some(12),
+                    readonly: Some(true),
+                }
+            }
+        }
+    };
+
+    let actions = rsx! {
+        ActionButton {
+            text: "Clear All".to_string(),
+            onclick: clear_all,
+            variant: Some("secondary".to_string()),
+        }
+    };
+
+    rsx! {
+        div { class: "space-y-8",
+            // Mode selection
+            ModeSelector {
+                current_mode: mode(),
+                modes: modes,
+                on_change: move |new_mode| {
+                    mode.set(new_mode);
+                    process_base64(());
                 }
             }
 
-            // Output section
-            if !output().is_empty() {
-                div {
-                    class: "space-y-2",
-                    div {
-                        class: "flex justify-between items-center",
-                        label {
-                            class: "block text-sm font-medium text-ctp-subtext1",
-                            if mode() == "encode" { "Base64 Output" } else { "Decoded Text" }
-                        }
-                        button {
-                            class: "px-3 py-1 text-xs bg-ctp-surface2 hover:bg-ctp-surface0 text-ctp-text transition-colors",
-                            onclick: move |_| {
-                                println!("📋 Copied Base64 result to clipboard");
-                            },
-                            "Copy"
-                        }
-                    }
-                    textarea {
-                        class: "w-full px-4 py-3 bg-ctp-base border border-ctp-surface2 text-ctp-text resize-none",
-                        rows: "6",
-                        readonly: true,
-                        value: "{output}"
-                    }
-                }
-            }
-
-            // Actions
-            div {
-                class: "flex gap-8 justify-center pt-12",
-                button {
-                    class: "btn-secondary",
-                    onclick: move |_| {
-                        input.set(String::new());
-                        output.set(String::new());
-                    },
-                    "Clear"
-                }
+            // Main tool grid
+            ToolGrid {
+                left_content: left_content,
+                right_content: right_content,
+                actions: Some(actions),
             }
         }
     }

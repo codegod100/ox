@@ -1,3 +1,4 @@
+use crate::components::tools::shared::*;
 use dioxus::prelude::*;
 
 /// JSON Formatter component
@@ -32,77 +33,76 @@ pub fn JsonFormatter(
         }
     };
 
-    rsx! {
-        div {
-            class: "space-y-16",
+    let clear_all = move |_| {
+        input.set(String::new());
+        output.set(String::new());
+        error.set(String::new());
+    };
 
-            // Input section
-            div {
-                class: "space-y-2",
-                label {
-                    class: "block text-sm font-medium text-ctp-subtext1",
-                    "Input JSON"
-                }
-                textarea {
-                    class: "w-full px-4 py-3 bg-ctp-base border border-ctp-surface2 text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-text resize-none",
-                    rows: "8",
-                    placeholder: "Paste your JSON here...",
-                    value: "{input}",
-                    oninput: move |event| {
+    let copy_output = move |_| {
+        if !output().is_empty() {
+            // TODO: Implement actual clipboard functionality
+            println!("📋 Copied JSON to clipboard");
+        }
+    };
+
+    let left_content = rsx! {
+        InputSection {
+            label: "Input JSON".to_string(),
+            helper_text: Some("Paste your JSON here to format and validate".to_string()),
+            input: rsx! {
+                ToolTextarea {
+                    value: input(),
+                    placeholder: "Paste your JSON here...".to_string(),
+                    rows: Some(12),
+                    oninput: Some(EventHandler::new(move |event: FormEvent| {
                         input.set(event.value());
                         format_json(());
-                    }
+                    })),
                 }
             }
+        }
+    };
 
-            // Error display
-            if !error().is_empty() {
-                div {
-                    class: "p-3 bg-ctp-red bg-opacity-20 border border-ctp-red text-ctp-red text-sm",
-                    "❌ {error}"
-                }
-            }
-
-            // Output section
-            if !output().is_empty() {
-                div {
-                    class: "space-y-2",
-                    div {
-                        class: "flex justify-between items-center",
-                        label {
-                            class: "block text-sm font-medium text-ctp-subtext1",
-                            "Formatted JSON"
-                        }
-                        button {
-                            class: "px-3 py-1 text-xs bg-ctp-surface2 hover:bg-ctp-surface0 text-ctp-text transition-colors",
-                            onclick: move |_| {
-                                println!("📋 Copied JSON to clipboard");
-                            },
-                            "copy"
-                        }
+    let right_content = rsx! {
+        OutputSection {
+            label: "Formatted JSON".to_string(),
+            helper_text: Some("Formatted and validated JSON output".to_string()),
+            copy_button: if !output().is_empty() {
+                Some(rsx! {
+                    CopyButton {
+                        text: output(),
+                        onclick: copy_output
                     }
-                    textarea {
-                        class: "w-full px-4 py-3 bg-ctp-base border border-ctp-surface2 text-ctp-text resize-none",
-                        rows: "8",
-                        readonly: true,
-                        value: "{output}"
-                    }
+                })
+            } else {
+                None
+            },
+            output: rsx! {
+                ToolTextarea {
+                    value: output(),
+                    placeholder: "Formatted JSON will appear here...".to_string(),
+                    rows: Some(12),
+                    readonly: Some(true),
                 }
             }
+        }
+    };
 
-            // Actions
-            div {
-                class: "flex gap-8 justify-center pt-12",
-                button {
-                    class: "btn-secondary",
-                    onclick: move |_| {
-                        input.set(String::new());
-                        output.set(String::new());
-                        error.set(String::new());
-                    },
-                    "Clear"
-                }
-            }
+    let actions = rsx! {
+        ActionButton {
+            text: "Clear All".to_string(),
+            onclick: clear_all,
+            variant: Some("secondary".to_string()),
+        }
+    };
+
+    rsx! {
+        ToolGrid {
+            left_content: left_content,
+            right_content: right_content,
+            actions: Some(actions),
+            error_message: Some(error()),
         }
     }
 }

@@ -17,10 +17,7 @@ pub fn NotFound(segments: Vec<String>) -> Element {
                 li { "/blog/[id]" }
                 li { "/tools" }
             }
-            Link {
-                to: crate::types::Route::Home {},
-                "← Back to Home"
-            }
+            Link { to: crate::types::Route::Home {}, "← Back to Home" }
         }
     }
 }
