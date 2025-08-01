@@ -1,7 +1,34 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   mode: "all",
-  content: ["./src/**/*.{rs,html,css}", "./dist/**/*.html"],
+  content: ["./src/**/*.rs", "./dist/**/*.html"],
+  safelist: [
+    // Ensure all Catppuccin colors are included
+    {
+      pattern: /^(bg|text|border)-ctp-.*/,
+    },
+    // Include gradient patterns
+    {
+      pattern: /^(bg-gradient|from|via|to)-ctp-.*/,
+    },
+    // Include animations
+    "animate-float",
+    "animate-shimmer",
+    "animate-glow-pulse",
+    "animate-slide-in",
+    "animate-fade-in",
+    "animate-scale-in",
+    "animate-shine",
+    // Include backdrop blur
+    "backdrop-blur-xl",
+    "backdrop-blur-2xl",
+    "backdrop-blur-4xl",
+    // Include shadows
+    "shadow-glow",
+    "shadow-glow-lg",
+    "shadow-glass",
+    "shadow-inner-glow",
+  ],
   theme: {
     extend: {
       colors: {

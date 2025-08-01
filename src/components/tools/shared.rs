@@ -15,18 +15,22 @@ pub struct ToolGridProps {
     success_message: Option<String>,
 }
 
-/// Standard grid layout for tool inputs and outputs
+/// Standard grid layout for tool inputs and outputs with modern glassmorphism
 #[component]
 pub fn ToolGrid(props: ToolGridProps) -> Element {
     rsx! {
-        div { class: "space-y-6",
+        div { class: "space-y-8",
 
-            // Error/Success messages
+            // Error/Success messages with modern styling
             if let Some(error) = props.error_message {
                 if !error.is_empty() {
                     div {
-                        class: "p-4 bg-ctp-red bg-opacity-20 border border-ctp-red text-ctp-red text-sm rounded-md",
-                        "❌ {error}"
+                        class: "relative overflow-hidden p-6 bg-gradient-to-r from-ctp-red/20 via-ctp-red/10 to-ctp-red/20 border border-ctp-red/40 backdrop-blur-xl text-ctp-red rounded-2xl shadow-lg animate-slide-in",
+                        div { class: "absolute inset-0 bg-gradient-to-r from-ctp-red/5 to-transparent" }
+                        div { class: "relative z-10 flex items-center space-x-3",
+                            div { class: "text-2xl animate-pulse", "❌" }
+                            span { class: "font-medium tracking-wide", "{error}" }
+                        }
                     }
                 }
             }
@@ -34,27 +38,34 @@ pub fn ToolGrid(props: ToolGridProps) -> Element {
             if let Some(success) = props.success_message {
                 if !success.is_empty() {
                     div {
-                        class: "p-4 bg-ctp-green bg-opacity-20 border border-ctp-green text-ctp-green text-sm rounded-md",
-                        "✅ {success}"
+                        class: "relative overflow-hidden p-6 bg-gradient-to-r from-ctp-green/20 via-ctp-green/10 to-ctp-green/20 border border-ctp-green/40 backdrop-blur-xl text-ctp-green rounded-2xl shadow-lg animate-slide-in",
+                        div { class: "absolute inset-0 bg-gradient-to-r from-ctp-green/5 to-transparent" }
+                        div { class: "relative z-10 flex items-center space-x-3",
+                            div { class: "text-2xl animate-pulse", "✅" }
+                            span { class: "font-medium tracking-wide", "{success}" }
+                        }
                     }
                 }
             }
 
-            // Main grid layout - responsive 2-column grid
+            // Main grid layout - responsive 2-column grid with enhanced styling
             div {
-                class: "grid grid-cols-1 lg:grid-cols-2 gap-8 items-start",
+                class: "grid grid-cols-1 xl:grid-cols-2 gap-12 items-start",
 
                 // Left column (Input)
-                div { class: "space-y-3", {props.left_content} }
+                div { class: "space-y-4 animate-slide-in", {props.left_content} }
 
                 // Right column (Output)
-                div { class: "space-y-3", {props.right_content} }
+                div { class: "space-y-4 animate-slide-in", {props.right_content} }
             }
 
-            // Actions row
+            // Actions row with glassmorphism
             if let Some(actions) = props.actions {
-                div { class: "flex gap-4 justify-center pt-6 border-t border-ctp-surface2",
-                    {actions}
+                div {
+                    class: "flex gap-6 justify-center pt-8 mt-8 border-t border-ctp-surface2/30 backdrop-blur-sm",
+                    div { class: "flex flex-wrap gap-4 justify-center",
+                        {actions}
+                    }
                 }
             }
         }
@@ -72,20 +83,24 @@ pub struct InputSectionProps {
     helper_text: Option<String>,
 }
 
-/// Standard input section with label and helper text
+/// Standard input section with modern styling
 #[component]
 pub fn InputSection(props: InputSectionProps) -> Element {
     rsx! {
-        div { class: "space-y-3",
+        div { class: "space-y-4 group",
             label {
-                class: "block text-sm font-medium text-ctp-subtext1",
+                class: "block text-lg font-medium text-ctp-text tracking-wide group-hover:text-ctp-mauve transition-colors duration-300",
                 "{props.label}"
             }
-            {props.input}
+            div { class: "relative",
+                {props.input}
+                // Subtle glow effect
+                div { class: "absolute inset-0 bg-gradient-to-r from-ctp-mauve/5 via-transparent to-ctp-blue/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" }
+            }
             if let Some(helper) = props.helper_text {
                 if !helper.is_empty() {
                     p {
-                        class: "text-xs text-ctp-subtext0 mt-1",
+                        class: "text-sm text-ctp-subtext0/80 font-light tracking-wide leading-relaxed",
                         "{helper}"
                     }
                 }
@@ -107,25 +122,31 @@ pub struct OutputSectionProps {
     helper_text: Option<String>,
 }
 
-/// Standard output section with label and optional copy button
+/// Standard output section with modern styling and copy functionality
 #[component]
 pub fn OutputSection(props: OutputSectionProps) -> Element {
     rsx! {
-        div { class: "space-y-3",
+        div { class: "space-y-4 group",
             div { class: "flex justify-between items-center",
                 label {
-                    class: "block text-sm font-medium text-ctp-subtext1",
+                    class: "block text-lg font-medium text-ctp-text tracking-wide group-hover:text-ctp-blue transition-colors duration-300",
                     "{props.label}"
                 }
                 if let Some(copy_btn) = props.copy_button {
-                    {copy_btn}
+                    div { class: "animate-fade-in",
+                        {copy_btn}
+                    }
                 }
             }
-            {props.output}
+            div { class: "relative",
+                {props.output}
+                // Success indicator glow
+                div { class: "absolute inset-0 bg-gradient-to-r from-ctp-blue/5 via-transparent to-ctp-teal/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" }
+            }
             if let Some(helper) = props.helper_text {
                 if !helper.is_empty() {
                     p {
-                        class: "text-xs text-ctp-subtext0 mt-1",
+                        class: "text-sm text-ctp-subtext0/80 font-light tracking-wide leading-relaxed",
                         "{helper}"
                     }
                 }
@@ -134,7 +155,7 @@ pub fn OutputSection(props: OutputSectionProps) -> Element {
     }
 }
 
-/// Standard textarea component with consistent styling
+/// Modern textarea component with glassmorphism styling
 #[component]
 pub fn ToolTextarea(
     value: String,
@@ -143,26 +164,37 @@ pub fn ToolTextarea(
     readonly: Option<bool>,
     oninput: Option<EventHandler<FormEvent>>,
 ) -> Element {
-    let rows = rows.unwrap_or(10);
+    let rows = rows.unwrap_or(12);
     let readonly = readonly.unwrap_or(false);
 
+    let base_classes = "w-full resize-none font-mono text-base leading-relaxed bg-gradient-to-br from-ctp-base/80 to-ctp-surface0/60 border border-ctp-surface2/50 backdrop-blur-xl rounded-2xl p-6 text-ctp-text placeholder-ctp-subtext0/60 transition-all duration-500 focus:border-ctp-mauve/60 focus:shadow-glow focus:bg-ctp-base/90 focus:outline-none";
+    let readonly_classes = if readonly {
+        " cursor-default bg-ctp-surface0/40"
+    } else {
+        " hover:border-ctp-text/40"
+    };
+
     rsx! {
-        textarea {
-            class: "w-full resize-none font-mono text-sm leading-relaxed",
-            rows: "{rows}",
-            readonly: readonly,
-            placeholder: "{placeholder}",
-            value: "{value}",
-            oninput: move |event| {
-                if let Some(handler) = oninput {
-                    handler.call(event);
-                }
-            },
+        div { class: "relative group",
+            textarea {
+                class: "{base_classes}{readonly_classes}",
+                rows: "{rows}",
+                readonly: readonly,
+                placeholder: "{placeholder}",
+                value: "{value}",
+                oninput: move |event| {
+                    if let Some(handler) = oninput {
+                        handler.call(event);
+                    }
+                },
+            }
+            // Subtle border glow effect
+            div { class: "absolute inset-0 bg-gradient-to-r from-ctp-mauve/10 via-ctp-blue/10 to-ctp-teal/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none blur-sm" }
         }
     }
 }
 
-/// Standard input component with consistent styling
+/// Modern input component with glassmorphism styling
 #[component]
 pub fn ToolInput(
     value: String,
@@ -173,33 +205,44 @@ pub fn ToolInput(
     let input_type = input_type.unwrap_or_else(|| "text".to_string());
 
     rsx! {
-        input {
-            r#type: "{input_type}",
-            class: "w-full px-4 py-3 bg-ctp-base border border-ctp-surface2 text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-text rounded-md transition-colors",
-            placeholder: "{placeholder}",
-            value: "{value}",
-            oninput: move |event| {
-                if let Some(handler) = oninput {
-                    handler.call(event);
-                }
-            },
+        div { class: "relative group",
+            input {
+                r#type: "{input_type}",
+                class: "w-full px-6 py-4 bg-gradient-to-br from-ctp-base/80 to-ctp-surface0/60 border border-ctp-surface2/50 backdrop-blur-xl rounded-2xl text-ctp-text text-lg placeholder-ctp-subtext0/60 transition-all duration-500 focus:outline-none focus:border-ctp-mauve/60 focus:shadow-glow focus:bg-ctp-base/90 hover:border-ctp-text/40",
+                placeholder: "{placeholder}",
+                value: "{value}",
+                oninput: move |event| {
+                    if let Some(handler) = oninput {
+                        handler.call(event);
+                    }
+                },
+            }
+            // Floating border effect
+            div { class: "absolute inset-0 bg-gradient-to-r from-ctp-mauve/10 via-ctp-blue/10 to-ctp-teal/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none blur-sm" }
         }
     }
 }
 
-/// Standard copy button component
+/// Modern copy button with sleek glassmorphism styling
 #[component]
 pub fn CopyButton(text: String, onclick: EventHandler<MouseEvent>) -> Element {
     rsx! {
         button {
-            class: "px-3 py-1 text-xs bg-ctp-surface2 hover:bg-ctp-surface0 text-ctp-text transition-colors rounded-md",
+            class: "group relative overflow-hidden px-6 py-3 bg-gradient-to-r from-ctp-surface1/60 to-ctp-surface2/40 border border-ctp-surface2/50 backdrop-blur-xl hover:border-ctp-mauve/60 text-ctp-text hover:text-ctp-mauve transition-all duration-300 rounded-xl font-medium tracking-wide shadow-lg hover:shadow-glow hover:scale-105",
             onclick: move |event| onclick.call(event),
-            "📋 Copy"
+
+            // Shine effect
+            div { class: "absolute inset-0 bg-shimmer-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-500 group-hover:animate-shine" }
+
+            span { class: "relative z-10 flex items-center space-x-2",
+                span { class: "text-lg", "📋" }
+                span { "Copy" }
+            }
         }
     }
 }
 
-/// Standard action button component
+/// Modern action button with variant styling and glassmorphism
 #[component]
 pub fn ActionButton(
     text: String,
@@ -213,23 +256,23 @@ pub fn ActionButton(
     let button_class = match variant.as_str() {
         "primary" => {
             if disabled {
-                "px-6 py-3 bg-ctp-surface2 text-ctp-subtext0 cursor-not-allowed transition-colors rounded-md"
+                "group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-ctp-surface2/50 to-ctp-surface1/50 border border-ctp-surface2/30 backdrop-blur-xl text-ctp-subtext0/50 cursor-not-allowed rounded-2xl font-medium tracking-wide transition-all duration-300"
             } else {
-                "px-6 py-3 bg-ctp-mauve hover:bg-ctp-mauve text-ctp-base hover:text-ctp-base transition-colors rounded-md"
+                "group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-ctp-mauve/80 to-ctp-blue/60 border border-ctp-mauve/60 backdrop-blur-xl hover:from-ctp-mauve hover:to-ctp-blue text-ctp-base hover:text-ctp-crust transition-all duration-300 rounded-2xl font-medium tracking-wide shadow-glow hover:shadow-glow-lg hover:scale-105"
             }
         }
         "danger" => {
             if disabled {
-                "px-6 py-3 bg-ctp-surface2 text-ctp-subtext0 cursor-not-allowed transition-colors rounded-md"
+                "group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-ctp-surface2/50 to-ctp-surface1/50 border border-ctp-surface2/30 backdrop-blur-xl text-ctp-subtext0/50 cursor-not-allowed rounded-2xl font-medium tracking-wide transition-all duration-300"
             } else {
-                "px-6 py-3 bg-ctp-red hover:bg-ctp-maroon text-ctp-base transition-colors rounded-md"
+                "group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-ctp-red/80 to-ctp-maroon/60 border border-ctp-red/60 backdrop-blur-xl hover:from-ctp-red hover:to-ctp-maroon text-ctp-base hover:text-ctp-crust transition-all duration-300 rounded-2xl font-medium tracking-wide shadow-lg hover:shadow-xl hover:scale-105"
             }
         }
         _ => {
             if disabled {
-                "px-6 py-3 bg-ctp-surface2 text-ctp-subtext0 cursor-not-allowed transition-colors rounded-md"
+                "group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-ctp-surface2/50 to-ctp-surface1/50 border border-ctp-surface2/30 backdrop-blur-xl text-ctp-subtext0/50 cursor-not-allowed rounded-2xl font-medium tracking-wide transition-all duration-300"
             } else {
-                "px-6 py-3 bg-ctp-surface2 hover:bg-ctp-surface0 text-ctp-text transition-colors rounded-md"
+                "group relative overflow-hidden px-8 py-4 bg-gradient-to-r from-ctp-surface1/60 to-ctp-surface2/40 border border-ctp-surface2/50 backdrop-blur-xl hover:border-ctp-text/60 text-ctp-text hover:text-ctp-mauve transition-all duration-300 rounded-2xl font-medium tracking-wide shadow-lg hover:shadow-glow hover:scale-105"
             }
         }
     };
@@ -243,28 +286,50 @@ pub fn ActionButton(
                     onclick.call(event);
                 }
             },
-            "{text}"
+
+            // Shine effect for non-disabled buttons
+            if !disabled {
+                div { class: "absolute inset-0 bg-shimmer-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-500 group-hover:animate-shine" }
+            }
+
+            span { class: "relative z-10", "{text}" }
         }
     }
 }
 
-/// Statistics display component for showing counts, stats, etc.
+/// Modern statistics display with glassmorphism and animations
 #[component]
 pub fn StatsDisplay(stats: Vec<(String, String)>) -> Element {
     rsx! {
         div {
-            class: "flex flex-wrap gap-6 justify-center py-4 px-6 bg-ctp-base border border-ctp-surface2 rounded-md",
-            for (label, value) in stats {
-                div { class: "text-sm text-ctp-subtext1",
-                    "{label}: "
-                    span { class: "font-medium text-ctp-text", "{value}" }
+            class: "relative overflow-hidden bg-gradient-to-br from-ctp-surface0/60 via-ctp-surface1/40 to-ctp-surface0/60 border border-ctp-surface2/50 backdrop-blur-xl rounded-2xl p-8 shadow-glass animate-scale-in",
+
+            // Background glow
+            div { class: "absolute inset-0 bg-gradient-to-r from-ctp-mauve/5 via-ctp-blue/5 to-ctp-teal/5 opacity-50" }
+
+            div {
+                class: "relative z-10 flex flex-wrap gap-8 justify-center",
+                for (i, (label, value)) in stats.into_iter().enumerate() {
+                    div {
+                        key: "{i}",
+                        class: "group text-center animate-fade-in",
+                        style: "animation-delay: {i * 100}ms",
+
+                        div { class: "text-sm text-ctp-subtext1/80 font-light tracking-wide uppercase mb-2",
+                            "{label}"
+                        }
+                        div { class: "text-2xl font-medium text-ctp-text group-hover:text-ctp-mauve transition-colors duration-300 tracking-wide",
+                            "{value}"
+                        }
+                        div { class: "w-8 h-0.5 bg-gradient-to-r from-ctp-mauve to-ctp-blue rounded-full mx-auto mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" }
+                    }
                 }
             }
         }
     }
 }
 
-/// Mode selector component for tools with multiple modes (encode/decode, etc.)
+/// Modern mode selector with sleek toggle styling
 #[component]
 pub fn ModeSelector(
     current_mode: String,
@@ -272,21 +337,28 @@ pub fn ModeSelector(
     on_change: EventHandler<String>,
 ) -> Element {
     rsx! {
-        div { class: "space-y-4",
+        div { class: "space-y-6 text-center",
             label {
-                class: "block text-sm font-medium text-ctp-subtext1 text-center",
+                class: "block text-lg font-medium text-ctp-text tracking-wide",
                 "Operation Mode"
             }
-            div { class: "flex gap-3 justify-center flex-wrap",
+            div { class: "inline-flex gap-2 p-2 bg-gradient-to-r from-ctp-surface0/60 to-ctp-surface1/40 border border-ctp-surface2/50 backdrop-blur-xl rounded-2xl shadow-inner-glow",
                 for (mode_value, mode_label) in modes {
                     button {
+                        key: "{mode_value}",
                         class: if current_mode == mode_value {
-                            "px-4 py-2 bg-ctp-mauve text-ctp-base transition-colors rounded-md"
+                            "relative px-6 py-3 bg-gradient-to-r from-ctp-mauve to-ctp-blue text-ctp-base font-medium rounded-xl shadow-glow transition-all duration-300 scale-105"
                         } else {
-                            "px-4 py-2 bg-ctp-surface2 hover:bg-ctp-surface0 text-ctp-text transition-colors rounded-md"
+                            "relative px-6 py-3 text-ctp-text hover:text-ctp-mauve font-medium rounded-xl transition-all duration-300 hover:bg-ctp-surface1/40"
                         },
                         onclick: move |_| on_change.call(mode_value.clone()),
-                        "{mode_label}"
+
+                        // Active state shine effect
+                        if current_mode == mode_value {
+                            div { class: "absolute inset-0 bg-shimmer-gradient opacity-30 rounded-xl animate-shine" }
+                        }
+
+                        span { class: "relative z-10", "{mode_label}" }
                     }
                 }
             }
