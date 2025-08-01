@@ -15,13 +15,16 @@ gloo-timers = { version = "0.3", features = ["futures"] }
 markov = "1.1"
 rand = { version = "0.8", features = ["small_rng"] }
 getrandom = { version = "0.2", features = ["js"] }
+base64 = "0.21"
+urlencoding = "2.1"
 
 [features]
-default = ["web"]
+default = ["fullstack"]
 web = ["dioxus/web"]
 desktop = ["dioxus/desktop"]
 mobile = ["dioxus/mobile"]
 server = ["dioxus/server"]
+fullstack = ["dioxus/fullstack"]
 
 [profile]
 
