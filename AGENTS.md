@@ -21,8 +21,15 @@
 - **String literals**: Use simple strings without special characters that could confuse the parser
 - **Component structure**: Keep RSX structure flat when possible to avoid macro parsing issues
 
+## Tailwind CSS Build Process
+- **CSS Source**: Edit `input.css` for custom styles and Tailwind imports
+- **Build Command**: `bunx tailwindcss -i input.css -o assets/tailwind.css --minify`
+- **Output Location**: Always build CSS to `assets/tailwind.css` (not root directory)
+- **Catppuccin Colors**: Use `ctp-*` classes (e.g., `bg-ctp-base`, `text-ctp-mauve`)
+- **Development**: CSS is auto-built during Docker build process
+
 ## Architecture
 - **Structure**: `src/` contains `main.rs`, `lib.rs`, `components/`, `pages/`, `server.rs`, `types.rs`
 - **Routing**: Uses Dioxus router with `#[derive(Routable)]` enum in `types.rs`
-- **Styling**: Tailwind CSS with Catppuccin color scheme (`ctp-*` classes)
+- **Styling**: Tailwind CSS v4 with Catppuccin color scheme (`ctp-*` classes)
 - **Assets**: Static files in `assets/` directory, use `asset!()` macro for references
