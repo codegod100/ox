@@ -281,7 +281,7 @@ pub fn ModeSelector(
                         rsx! {
                             button {
                                 key: "{mode_value}",
-                                class: if current_mode == mode_value { "px-3 py-2 bg-ctp-mauve text-ctp-base font-medium rounded-sm transition-colors" } else { "px-3 py-2 text-ctp-text hover:text-ctp-mauve font-medium rounded-sm transition-colors hover:bg-ctp-surface1" },
+                                class: if current_mode == mode_value { "px-3 py-2 bg-ctp-surface2 text-ctp-text font-medium rounded-sm transition-colors" } else { "px-3 py-2 text-ctp-text hover:text-ctp-mauve font-medium rounded-sm transition-colors hover:bg-ctp-surface1" },
                                 onclick: move |_| on_change.call(mode_value_clone.clone()),
                                 "{mode_label}"
                             }
